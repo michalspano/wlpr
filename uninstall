@@ -1,0 +1,4 @@
+#!/bin/sh
+rm -f /usr/local/bin/wlpr
+rm -f ~/.wlpr.json
+rm -rf ./*

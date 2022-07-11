@@ -1,0 +1,11 @@
+#!/bin/sh
+SRC=$1
+PATH="$HOME/.wlpr.json"
+if [ -z "$SRC" ]; then
+    echo "Usage: $0 <path to image>"
+    exit 1
+fi
+echo "{\"src_path\": \"${SRC}\"}" > $PATH
+/bin/cp ./bin/wlpr /usr/local/bin/wlpr # copy the bin to /usr/local/bin (default)
+
+# we name the file as `init`, sice `install` will overwrite the install command

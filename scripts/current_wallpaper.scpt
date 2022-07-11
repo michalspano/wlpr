@@ -1,0 +1,1 @@
+osascript -e 'tell app "finder" to get posix path of (get desktop picture as alias)'
