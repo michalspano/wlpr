@@ -7,7 +7,21 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 	"time"
+)
+
+// I use the stack of constants for clarity
+const (
+	JSON_PARAM_LENGTH = 2
+	LEFT_BOX          = "╟"
+	RIGHT_BOX         = "╢"
+	ASCII_RED         = "\x1b[31m"
+	ASCII_LIGHT_BLUE  = "\x1b[94m"
+	ASCII_RESET       = "\x1b[0m"
+	ASCII_CYAN        = "\x1b[36m"
+	EMOJI             = "┌( ಠ‿ಠ)┘"
 )
 
 /* TODO: fade in/out the wallpaper
@@ -15,43 +29,46 @@ import (
 - linked article: https://discussions.apple.com/thread/250539801 */
 
 func main() {
+	var SCRIPT_SRC, IMG_DIR string // initial path buffers
+	var conf map[string]string     // buffer to store the map
+
 	HOME, _ := os.UserHomeDir() // get the $HOME directory
-	DIR, _ := os.Getwd()        // get the current directory
-
-	// Set up the paths
 	confPath := HOME + "/.wlpr.json"
-	SCRIPT_SRC := DIR + "/scripts/"
 
+	// open the config file
 	file, err := openFile(confPath)
 	if err != nil {
-		fmt.Println("No config file found, run './init'")
-		os.Exit(1)
+		raiseError("No config file found, run './init'")
 	}
 
-	var conf map[string]string // buffer to store the map
-
-	// read and unmarshal JSON config file
+	// read the config file
 	data, err := readFile(file)
+	if err != nil {
+		raiseError("Error reading config file")
+	}
+
+	// unmarshal the json
 	json.Unmarshal(data, &conf)
 
-	// assume that there is only one configuration option
-	if len(conf) != 1 {
-		fmt.Println("Config file is invalid, run ./init")
-		os.Exit(1)
+	if len(conf) != JSON_PARAM_LENGTH {
+		raiseError("Config file is invalid, run ./init")
 	}
 
-	// append the directory and check if it exists
-	IMG_DIR := conf["src_path"]
+	// evaluate the JSON parsed paths
+	IMG_DIR, SCRIPT_SRC = conf["src_path"], conf["root"]
+
+	/* We check whether `IMG_DIR` exits, if not, we warnt the user.
+	   We dont' need to chcek if `SCRIPT_SCR` exits, because it's
+	   been created by the init script. */
+
 	if _, err := os.Stat(IMG_DIR); os.IsNotExist(err) {
-		fmt.Printf("Directory %s does not exist\n", IMG_DIR)
-		os.Exit(1)
+		raiseError("Directory " + IMG_DIR + " does not exist")
 	}
 
 	// get the current wallpaper using osascript
 	currentWallpaper, err := getCurrentWallpaper(SCRIPT_SRC + "current_wallpaper.scpt")
 	if err != nil {
-		fmt.Println("Error getting current wallpaper")
-		os.Exit(1)
+		raiseError("Error getting current wallpaper")
 	}
 
 	buff := getFiles(IMG_DIR)
@@ -67,6 +84,23 @@ func main() {
 
 	// set the wallpaper
 	exec.Command("/bin/bash", "-c", SCRIPT_SRC+"setter.scpt"+" "+imgPath).Run()
+
+	// flag to disable the ending footer
+	args := os.Args[1:]
+	if len(args) == 1 {
+		if args[0] == "--no-message" || args[0] == "-nm" {
+			return
+		}
+	}
+
+	// display the footer (indicates success) [default behavior]
+	displayFooter()
+}
+
+// raise a formatted error to the console and abort the program
+func raiseError(errorMessage string) {
+	fmt.Printf("%s%s%s\n", ASCII_RED, errorMessage, ASCII_RESET)
+	os.Exit(1)
 }
 
 // open a file and catch errors
@@ -98,4 +132,44 @@ func getCurrentWallpaper(script string) (string, error) {
 		return "", err
 	}
 	return string(out[:len(out)-1]), nil
+}
+
+func getTerminalWidth() (int, error) {
+	cmd := exec.Command("stty", "size")
+	cmd.Stdin = os.Stdin
+	out, _ := cmd.Output()
+
+	// obtain an array with: [width height]
+	dims := strings.Split(string(out[:len(out)-1]), " ")
+
+	// return the height (second element) parsed as an int
+	return strconv.Atoi(dims[1])
+}
+
+func displayFooter() {
+	// predefined footer buffers
+	startMsg, endMsg := "Changed successfully!", LEFT_BOX+" wlpr "+RIGHT_BOX
+
+	// print the first part of the line
+	fmt.Printf("%s%s %s%s", ASCII_CYAN, EMOJI, ASCII_RESET, startMsg)
+
+	width, err := getTerminalWidth()
+	if err != nil {
+		raiseError("Error getting terminal size")
+	}
+
+	// the number of (visual) pixels used by the predefined buffers
+	stdinLen := len(startMsg) + len(EMOJI) - 10
+
+	/* The number of pixels filled with empty spaces, such that the
+	ending part of the footer will be displayed to the complete right
+	of the width of the terminal session */
+
+	relativeLen := width - stdinLen - len(endMsg) + 2 // +2 extra padding
+	for i := 0; i < relativeLen; i++ {
+		fmt.Printf(" ")
+	}
+
+	// display the ending part; add new line
+	fmt.Printf("%s%s%s\n", ASCII_LIGHT_BLUE, endMsg, ASCII_RESET)
 }
