@@ -46,7 +46,7 @@ __FYI__, I'm using this [repositery](https://github.com/linuxdotexe/nordic-wallp
 
 1. Fork the repository
 ```sh
-$ git clone -b public --single-branch https://github.com/michalspano/wlpr.git && cd repo
+$ git clone -b public --single-branch https://github.com/michalspano/wlpr.git && cd wlpr
 ```
 
 2. Call the `init` script (from within the repository)
