@@ -96,4 +96,4 @@ I'm __open__ to any contribution to the repository. If you have any suggestions 
 [license-shield]: https://img.shields.io/github/license/michalspano/wlpr.svg?style=for-the-badge
 [license-url]: https://github.com/michalspano/wlpr/blob/main/LICENSE
 [release-shield]: https://img.shields.io/github/tag/michalspano/wlpr.svg?style=for-the-badge
-[release-url]: https://github.com/michalspano/wlpr/releases/latest/
+[release-url]: https://github.com/michalspano/wlpr/tags/latest
