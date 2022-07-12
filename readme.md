@@ -7,9 +7,10 @@
 
                     ***
 -->
-<h1>
-  <code>wlpr</code> - Wallpaper CLI Application for macOS <img src="assets/wlpr-logo.png" width="35" height="35"> 
-</h1>
+# `wlpr` - Wallpaper CLI Application for macOS
+
+<!-- ICON -->
+<p align="center"><img src="assets/wlpr-logo.png" width="150"height="auto"alt="icon-logo"></p>
 
 <!-- GitHub Shields -->
 [![Forks][forks-shield]][forks-url]
