@@ -79,7 +79,7 @@ func main() {
 
 	// we would like to change the wallpaper, such that it won't be the current one
 	for imgPath == currentWallpaper {
-		imgPath = IMG_DIR + "/" + buff[rand.Intn(len(buff))]
+		imgPath = IMG_DIR + buff[rand.Intn(len(buff))]
 	}
 
 	// set the wallpaper
