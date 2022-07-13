@@ -75,7 +75,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano()) // seed the random generator
 
 	// append a random picture from the selected directory
-	imgPath := IMG_DIR + "/" + buff[rand.Intn(len(buff))]
+	imgPath := IMG_DIR + buff[rand.Intn(len(buff))]
 
 	// we would like to change the wallpaper, such that it won't be the current one
 	for imgPath == currentWallpaper {
