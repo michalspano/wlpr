@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -22,6 +23,7 @@ const (
 	ASCII_RESET       = "\x1b[0m"
 	ASCII_CYAN        = "\x1b[36m"
 	EMOJI             = "┌( ಠ‿ಠ)┘"
+	TAG_FETCH_URL     = "https://api.github.com/repos/michalspano/wlpr/tags"
 )
 
 /* TODO: fade in/out the wallpaper
@@ -31,6 +33,25 @@ const (
 func main() {
 	var SCRIPT_SRC, IMG_DIR string // initial path buffers
 	var conf map[string]string     // buffer to store the map
+	var showFooter bool = true     // show the message by default
+
+	/* Optional flags
+	-nm: display no ending message
+	-v: display the current version at remote GitHub reposiroty
+	 We parse the optional flags before the execution of the program */
+
+	args := os.Args[1:]
+	if len(args) == 1 {
+		switch args[0] {
+		case "-nm", "--no-message":
+			showFooter = false
+		case "-v", "--version":
+			fmt.Println(fetchCurrentVersion())
+			return
+		default:
+			raiseError("Invalid flag")
+		}
+	}
 
 	HOME, _ := os.UserHomeDir() // get the $HOME directory
 	confPath := HOME + "/.wlpr.json"
@@ -85,16 +106,10 @@ func main() {
 	// set the wallpaper
 	exec.Command("/bin/bash", "-c", SCRIPT_SRC+"setter.scpt"+" "+imgPath).Run()
 
-	// flag to disable the ending footer
-	args := os.Args[1:]
-	if len(args) == 1 {
-		if args[0] == "--no-message" || args[0] == "-nm" {
-			return
-		}
-	}
-
 	// display the footer (indicates success) [default behavior]
-	displayFooter()
+	if showFooter {
+		displayFooter()
+	}
 }
 
 // raise a formatted error to the console and abort the program
@@ -172,4 +187,20 @@ func displayFooter() {
 
 	// display the ending part; add new line
 	fmt.Printf("%s%s%s\n", ASCII_LIGHT_BLUE, endMsg, ASCII_RESET)
+}
+
+// fetch the applicaitons current tag via GitHub
+func fetchCurrentVersion() string {
+	var tags []map[string]string // form: [{string: string}]
+	response, _ := http.Get(TAG_FETCH_URL)
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		raiseError("Error fetching current version")
+	}
+	json.Unmarshal(body, &tags) // unmarshal the json
+
+	/* we assume that the latest tag is defined at the first index,
+	given by the key-value "name" in the dictionary */
+
+	return tags[0]["name"]
 }
