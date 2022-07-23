@@ -78,8 +78,14 @@ The `init` method creates a `~/.wlpr.json` file that contains the path to the fo
 $ wlpr --no-message
 $ wlpr -nm
 ```
+`
+2. Print the current __version__:
+```sh
+$ wlpr --version
+$ wlpr -v
+```
 
-\*Both of these variants are valid.
+\*Both of the mentioned variants are valid.
 
 ### Contributing
 
