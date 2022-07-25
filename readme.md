@@ -64,7 +64,13 @@ $ wlpr --no-message
 $ wlpr -nm
 ```
 
-\*Both of these variants are valid.
+2. Print the current __version__:
+```sh
+$ wlpr --version
+$ wlpr -v
+```
+
+\*Both of the mentioned variants are valid.
 
 ### Contributing
 
