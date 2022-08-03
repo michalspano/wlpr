@@ -25,5 +25,6 @@ rm /usr/local/bin/wlpr
 rm ~/.wlpr.json
 sudo rm -rf $ROOT
 
-echo -e "\033[32mUninstallation complete.\033[0m"
+printf "\033[32mUninstallation complete.\033[0m\n"
+printf "Type 'cd ..' to escape seamlessly\n"
 exit 0
