@@ -15,7 +15,7 @@ JSON_DATA=$(< ~/.wlpr.json ruby -rjson -e "puts JSON.pretty_generate(JSON[STDIN.
 ROOT_DICT=$(echo $JSON_DATA | grep -o '"root": ".*"')
 ROOT=$(echo $ROOT_DICT | sed 's/"root": "//g' | sed 's/"//g')
 
-DIR=$(pwd)
+DIR=$(pwd)"/"
 if [ "$DIR" != "$ROOT" ]; then
     echo "Please run this script in the root directory of the project."
     exit 1
@@ -25,5 +25,5 @@ rm /usr/local/bin/wlpr
 rm ~/.wlpr.json
 sudo rm -rf $ROOT
 
-echo -e "\e[32m[+] Successfully uninstalled the project.\e[0m"
+echo -e "\033[32mUninstallation complete.\033[0m"
 exit 0
