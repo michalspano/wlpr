@@ -10,9 +10,16 @@
 ------------------------------------------------------------------------
  '
 
+RM=/bin/rm
+SUDO=/usr/bin/sudo
+BASENAME=/usr/bin/basename
+
+PATH=$(pwd)
+DIR=$($BASENAME $PATH)
+
 function UNINSTALL {
-    rm -f /usr/local/bin/wlpr ~/.wlpr.json
-    sudo rm -rf ./*
+    RM -f /usr/local/bin/wlpr ~/.wlpr.json
+    SUDO RM -rf ./*
 }
 
 function CLRS {
@@ -21,10 +28,6 @@ function CLRS {
     elif [ "$1" == "reset" ]; then printf "\033[0m"
     fi
 }
-
-PATH=$(pwd)
-BASENAME=/usr/bin/basename
-DIR=$($BASENAME $PATH)
 
 if [ "$DIR" != "wlpr" ]; then
     CLRS red; printf "This script must be run in the "
