@@ -3,36 +3,27 @@
 : '
 ------------------------------------------------------------------------
 - We insist that the script be run in the root directory of the project
-- The root directory should remain named as "wlpr"
+- We check that from the ~/.wlpr.json configuration file, where we parse
+  the JSON object and obtain the root directory of the project
 - 1. We firstly delete the binary (a.k.a. the unix executable).
 - 2. Then, we delete the configuration file from the home directory.
 - 3. Finally, we delete the contents of the repository.
 ------------------------------------------------------------------------
  '
 
-RM=/bin/rm
-SUDO=/usr/bin/sudo
-BASENAME=/usr/bin/basename
+JSON_DATA=$(< ~/.wlpr.json ruby -rjson -e "puts JSON.pretty_generate(JSON[STDIN.read]);")
+ROOT_DICT=$(echo $JSON_DATA | grep -o '"root": ".*"')
+ROOT=$(echo $ROOT_DICT | sed 's/"root": "//g' | sed 's/"//g')
 
-PATH=$(pwd)
-DIR=$($BASENAME $PATH)
-
-function UNINSTALL {
-    $RM -f /usr/local/bin/wlpr ~/.wlpr.json
-    $SUDO $RM -rf ./*
-}
-
-function CLRS {
-    if   [ "$1" == "red"   ]; then printf "\033[31m"
-    elif [ "$1" == "green" ]; then printf "\033[32m"
-    elif [ "$1" == "reset" ]; then printf "\033[0m"
-    fi
-}
-
-if [ "$DIR" != "wlpr" ]; then
-    CLRS red; printf "This script must be run in the "
-    printf "root directory of the project!\n"; CLRS reset
+DIR=$(pwd)
+if [ "$DIR" != "$ROOT" ]; then
+    echo "Please run this script in the root directory of the project."
     exit 1
 fi
 
-UNINSTALL; CLRS green; printf "Uninstallation complete!\n"; CLRS reset
+rm /usr/local/bin/wlpr
+rm ~/.wlpr.json
+sudo rm -rf $ROOT
+
+echo -e "\e[32m[+] Successfully uninstalled the project.\e[0m"
+exit 0
