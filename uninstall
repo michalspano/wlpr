@@ -1,4 +1,35 @@
 #!/bin/sh
-rm -f /usr/local/bin/wlpr
-rm -f ~/.wlpr.json
-rm -rf ./*
+
+: '
+------------------------------------------------------------------------
+- We insist that the script be run in the root directory of the project
+- The root directory should remain named as "wlpr"
+- 1. We firstly delete the binary (a.k.a. the unix executable).
+- 2. Then, we delete the configuration file from the home directory.
+- 3. Finally, we delete the contents of the repository.
+------------------------------------------------------------------------
+ '
+
+function UNINSTALL {
+    rm -f /usr/local/bin/wlpr ~/.wlpr.json
+    sudo rm -rf ./*
+}
+
+function CLRS {
+    if   [ "$1" == "red"   ]; then printf "\033[31m"
+    elif [ "$1" == "green" ]; then printf "\033[32m"
+    elif [ "$1" == "reset" ]; then printf "\033[0m"
+    fi
+}
+
+PATH=$(pwd)
+BASENAME=/usr/bin/basename
+DIR=$($BASENAME $PATH)
+
+if [ "$DIR" != "wlpr" ]; then
+    CLRS red; printf "This script must be run in the "
+    printf "root directory of the project!\n"; CLRS reset
+    exit 1
+fi
+
+UNINSTALL; CLRS green; printf "Uninstallation complete!\n"; CLRS reset
