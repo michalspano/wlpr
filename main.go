@@ -76,7 +76,7 @@ func main() {
 	}
 
 	// evaluate the JSON parsed paths
-	IMG_DIR, SCRIPT_SRC = conf["src_path"], conf["root"]
+	IMG_DIR, SCRIPT_SRC = conf["src_path"], conf["root"]+"scripts/"
 
 	/* We check whether `IMG_DIR` exits, if not, we warnt the user.
 	   We dont' need to chcek if `SCRIPT_SCR` exits, because it's
