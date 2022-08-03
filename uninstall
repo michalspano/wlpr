@@ -18,8 +18,8 @@ PATH=$(pwd)
 DIR=$($BASENAME $PATH)
 
 function UNINSTALL {
-    RM -f /usr/local/bin/wlpr ~/.wlpr.json
-    SUDO RM -rf ./*
+    $RM -f /usr/local/bin/wlpr ~/.wlpr.json
+    $SUDO $RM -rf ./*
 }
 
 function CLRS {
