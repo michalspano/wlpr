@@ -1,0 +1,29 @@
+#!/bin/sh
+
+: '
+------------------------------------------------------------------------
+- We insist that the script be run in the root directory of the project
+- We check that from the ~/.wlpr.json configuration file, where we parse
+  the JSON object and obtain the root directory of the project
+- 1. We firstly delete the binary (a.k.a. the unix executable).
+- 2. Then, we delete the configuration file from the home directory.
+- 3. Finally, we delete the contents of the repository.
+------------------------------------------------------------------------
+ '
+
+JSON_DATA=$(< ~/.wlpr.json ruby -rjson -e "puts JSON.pretty_generate(JSON[STDIN.read]);")
+ROOT_DICT=$(echo $JSON_DATA | grep -o '"root": ".*"')
+ROOT=$(echo $ROOT_DICT | sed 's/"root": "//g' | sed 's/"//g')
+
+DIR=$(pwd)
+if [ "$DIR" != "$ROOT" ]; then
+    echo "Please run this script in the root directory of the project."
+    exit 1
+fi
+
+rm /usr/local/bin/wlpr
+rm ~/.wlpr.json
+sudo rm -rf $ROOT
+
+echo -e "\e[32m[+] Successfully uninstalled the project.\e[0m"
+exit 0
